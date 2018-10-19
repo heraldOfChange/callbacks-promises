@@ -2,19 +2,18 @@
 
 let composedString = '';
 
-const composeStringWithTimeout = (str, timeout, callback) =>
-    setTimeout(() => {
-        composedString += str;
-        callback();
-    }, timeout);
+const composeStringWithTimeout = (str, timeout) =>
+    new Promise((resolve, reject) =>
+        setTimeout(() => {
+            composedString += str;
+            resolve();
+        }, timeout));
 
-const composeString = () =>
-    composeStringWithTimeout('A', 400, () =>
-        composeStringWithTimeout('B', 300, () =>
-            composeStringWithTimeout('C', 200, () =>
-                composeStringWithTimeout('D', 100, () => console.info(composedString))
-            )
-        )
-    );
+const composeString =  () =>
+    composeStringWithTimeout('A', 400)
+        .then(() => composeStringWithTimeout('B', 300))
+        .then(() => composeStringWithTimeout('C', 200))
+        .then(() => composeStringWithTimeout('D', 100));
 
-setTimeout(composeString, 1000);
+composeString()
+    .then(() => console.info(composedString));
